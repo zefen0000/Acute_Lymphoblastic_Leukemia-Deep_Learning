@@ -8,9 +8,12 @@ from collections import Counter
 
 def exploration_datset(dataset_path, dataset_type="Original"):
     """
-    description: function for exploration dataset and know the statistics in it
+    description: 
+        function for exploration dataset and know the statistics in it
     
-    args: dataset_path (path data), dataset_type (typology of dataset)
+    args: 
+        dataset_path: path data,
+        dataset_type: typology of dataset
     
     """
     print(f"\n Dataset analysis: {dataset_type.upper()}")
@@ -55,9 +58,12 @@ def exploration_datset(dataset_path, dataset_type="Original"):
 
 def visualize_dataset_stats(stats_original, stats_segmented):
     """
-    description: visualization dataset statistics
+    description: 
+        visualization dataset statistics
     
-    args: stats_original, stats_segmented (paths of sub-directory dataset)
+    args: 
+        stats_original, 
+        stats_segmented: paths of sub-directory dataset
     """
     fig, axes = plt.subplots(2,2, figsize=(15,10))
     fig.suptitle('Analysis of Acute Lymphoblastic Leukemia', 
@@ -128,9 +134,12 @@ def visualize_dataset_stats(stats_original, stats_segmented):
 
 def dataset_summary(stats_original, stats_segmented):
     """ 
-    description: visualization of statistics
+    description: 
+        visualization of statistics
     
-    args: stats_original, stats_segmented (stats dictionaries)
+    args: 
+        stats_original, 
+        stats_segmented: stats dictionaries
     """
     
     print("\n ===== SUMMARY DATASET =====")
@@ -168,13 +177,13 @@ def dataset_summary(stats_original, stats_segmented):
     if stats_segmented['formats']:
         format_counts = Counter(stats_segmented['formats'])
         for format_type, count in format_counts.items():
-            print(f"     {format_type}: {count} images")
+            print(f"{format_type}: {count} images")
     else:
-        print("     No format data available")
+        print("No format data available")
         
     # Most common image sizes
     print(f"\n MOST COMMON IMAGE SIZES:")
-    print("   Original Dataset:")
+    print("Original Dataset:")
     if stats_original['image_sizes']:
         size_counts = Counter(stats_original['image_sizes'])
         for size, count in size_counts.most_common(5):
@@ -186,7 +195,7 @@ def dataset_summary(stats_original, stats_segmented):
     if stats_segmented['image_sizes']:
         size_counts = Counter(stats_segmented['image_sizes'])
         for size, count in size_counts.most_common(5):
-            print(f"     {size[0]}x{size[1]}: {count} images")
+            print(f"{size[0]}x{size[1]}: {count} images")
     else:
         print("No size data available")
 
