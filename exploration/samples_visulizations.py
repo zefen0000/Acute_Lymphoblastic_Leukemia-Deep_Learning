@@ -5,8 +5,66 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 def visualize_class_samples(dataset_path, dataset_type="Original", samples_per_class=4):
-    pass
+    """
+    description:
+        visualize samples from each class to understand the data
     
+    args:
+        dataset_path,
+        dataset_type,
+        samples_per_class
+    """
+    base_path = os.path.join(dataset_path, dataset_type)
+    classes = ['Benign', 'Early', 'Pre', 'Pro']
+    
+    fig, axes = plt.subplots(len(classes), samples_per_class,
+                             figsize=(16, 12))
+    fig.suptitle(f'Leukemia Dataset Samples - {dataset_type}',
+                 fontsize=16, fontweight='bold')
+    
+    for class_idx, class_name in enumerate(classes):
+        class_path = os.path.join(base_path, class_name)
+        
+        if os.path.exists(class_path):
+            # get random samples
+            images = [f for f in os.listdir(class_path)
+                      if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+            
+            sample_images = random.sample(images,
+                                          min(samples_per_class, len(images)))
+            
+            for img_idx, img_file in enumerate(sample_images):
+                img_path = os.path.join(class_path, img_file)
+                
+                try:
+                    img = Image.open(img_path)
+                    
+                    # display image
+                    axes[class_idx, img_idx].imshow(img)
+                    axes[class_idx, img_idx].axis('off')
+                    
+                    # add title only to first image of each row
+                    if img_idx == 0:
+                        axes[class_idx, img_idx].set_ylabel(
+                            f'{class_name}\n(n={len(images)})',
+                            fontweight='bold', fontsize=12, rotation=0,
+                            ha='right', va='center'
+                        )
+                        
+                    # add image filename as subtitle
+                    axes[class_idx, img_idx].set_title(f'{img_file[:15]}...',
+                                                       fontsize=8)
+                    
+
+                except Exception as e:
+                    axes[class_idx, img_idx].text(0.5, 0.5, f'Error\n{str(e)[:20]}',
+                                                  ha='center', va='center',
+                                                  transform=axes[class_idx, img_idx].transAxes)
+                    axes[class_idx, img_idx].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
+
 def compare_original_vs_segmented(dataset_path, class_name="Early", number_pairs=3):
     pass
     
