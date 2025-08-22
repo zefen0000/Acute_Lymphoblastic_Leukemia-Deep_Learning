@@ -66,14 +66,77 @@ def visualize_class_samples(dataset_path, dataset_type="Original", samples_per_c
     plt.show()
 
 def compare_original_vs_segmented(dataset_path, class_name="Early", number_pairs=3):
-    pass
+    """
+    description:
+        compare Original vs Segmented images to understand preprocessing
     
+    args:
+        dataset_path,
+        class_name,
+        number_pairs
+    """
+    original_path = os.path.join(dataset_path, "Original", class_name)
+    segmented_path = os.path.join(dataset_path, "Segmented", class_name)
+    
+    fig, axes = plt.subplots(2, number_pairs, figsize=(15,8))
+    fig.suptitle(f'Original vs Segmented Comparison - {class_name} Class',
+                 fontsize=16, fontweight='bold')
+    
+    # get image lists
+    original_images = [f for f in os.listdir(original_path)
+                       if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+    segmented_images = [f for f in os.listdir(segmented_path)
+                        if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+    
+    # sample random images
+    sample_images = random.sample(original_images, min(number_pairs, len(original_images)))
+    
+    for i, img_name in enumerate(sample_images):
+        # original image
+        orig_img_path = os.path.join(original_path, img_name)
+        try:
+            orig_img = Image.open(orig_img_path)
+            axes[0, i].imshow(orig_img)
+            axes[0, i].set_title(f'Original\n{img_name[:20]}...', fontsize=10)
+            axes[0, i].axis('off')
+        except Exception as e:
+            axes[0, i].text(0.5, 0.5, f'Error: {str(e)[:20]}',
+                            ha='center', va='center',
+                            transform=axes[0, i].transAxes)
+            axes[0, i].axis('off')
+        
+        # segmented image (try to find matching or use random)
+        seg_img_path = os.path.join(segmented_path, img_name)
+        if not os.path.exists(seg_img_path) and segmented_images:
+            seg_img_path = os.path.join(segmented_path, random.choice(segmented_images))
+
+        if os.path.exists(seg_img_path):
+            try:
+                seg_img = Image.open(seg_img_path)
+                axes[1, i].imshow(seg_img)
+                axes[1, i].set_title(f'Segmented\n{os.path.basename(seg_img_path)[:20]}...',
+                                     fontsize=10)
+                axes[1, i].axis('off')
+            except Exception as e:
+                axes[1, i].text(0.5, 0.5, f'Error: {str(e)[:20]}',
+                                ha='center', va='center',
+                                transform=axes[1, i].transAxes)
+                axes[1, i].axis('off')
+
+    # add row labels
+    axes[0,0].set_ylabel('ORIGINAL', fontweight='bold', fontsize=14,
+                         rotation=90, ha='right', va='center')
+    axes[1,0].set_ylabel('SEGMENTED', fontweight='bold', fontsize=14,
+                         rotation=90, ha='right', va='center')
+    
+    plt.tight_layout()
+    plt.show()
 
 def analyze_pixel_distributions(dataset_path, data_type="Original",
                                class_name="Early", number_pairs=20):
     pass
     
-if __name__== "__main__":
+if __name__ == "__main__":
     # data path
     dataset_path = r"C:\Users\fenzi\repo_git\Acute_Lymphoblastic_Leukemia-Deep_Learning\dataset"
     
