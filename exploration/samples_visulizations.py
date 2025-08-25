@@ -132,9 +132,87 @@ def compare_original_vs_segmented(dataset_path, class_name="Early", number_pairs
     plt.tight_layout()
     plt.show()
 
-def analyze_pixel_distributions(dataset_path, data_type="Original",
-                               class_name="Early", number_pairs=20):
-    pass
+def analyze_pixel_distributions(dataset_path, dataset_type="Original",
+                                class_name="Early", num_samples=20):
+    """
+    description:
+        analyze pixel intensity distributions to understand data characteristics
+    
+    args:
+        dataset_path,
+        dataset_type,
+        class_name,
+        num_samples
+    """
+    class_path = os.path.join(dataset_path, dataset_type, class_name)
+    images = [f for f in os.listdir(class_path)
+              if f.lower().endswith(('.jpg', '.jpeg', '.png'))]
+    
+    sample_images = random.sample(images, min(num_samples, len(images)))
+    
+    pixel_data = []
+    brightness_data = []
+    
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    fig.suptitle(f'Pixel Analysis - {dataset_type} {class_name} Class',
+                 fontsize=16, fontweight='bold')
+    
+    for img_file in sample_images:
+        img_path = os.path.join(class_path, img_file)
+        try:
+            img = Image.open(img_path)
+            img_array = np.array(img)
+            
+            # for RGB images, convert to grayscale for analysis
+            if len(img_array.shape) == 3:
+                gray_img = np.mean(img_array, axis=2)
+            else:
+                gray_img = img_array
+            
+            pixel_data.extend(gray_img.flatten())
+            brightness_data.append(np.mean(gray_img))
+            
+        except Exception as e:
+            print(f"Error processing {img_file}: {e}")
+    
+    # plot 1: pixel intensity histogram
+    axes[0].hist(pixel_data, bins=50, alpha=0.7, color='skyblue', edgecolor='black')
+    axes[0].set_title('Pixel Intensity Distribution')
+    axes[0].set_xlabel('Pixel Intensity (0-255)')
+    axes[0].set_ylabel('Frequency')
+    axes[0].grid(True, alpha=0.3)
+    
+    # plot 2: brightness distribution
+    axes[1].hist(brightness_data, bins=20, alpha=0.7, color='lightcoral', edgecolor='black')
+    axes[1].set_title('Image Brightness Distribution')
+    axes[1].set_xlabel('Mean Brightness')
+    axes[1].set_ylabel('Number of Images')
+    axes[1].grid(True, alpha=0.3)
+    
+    # plot 3: sample image with histogram
+    if sample_images:
+        sample_img_path = os.path.join(class_path, sample_images[0])
+        sample_img = Image.open(sample_img_path)
+        sample_array = np.array(sample_img)
+        
+        if len(sample_array.shape) == 3:
+            sample_gray = np.mean(sample_array, axis=2)
+        else:
+            sample_gray = sample_array
+
+        axes[2].imshow(sample_gray, cmap='gray')
+        axes[2].set_title(f'Sample Image\nBrightness: {np.mean(sample_gray):.1f}')
+        axes[2].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
+    
+    return {
+        'mean_brightness': np.mean(brightness_data),
+        'std_brightness': np.std(brightness_data),
+        'pixel_mean': np.mean(pixel_data),
+        'pixel_std': np.std(pixel_data)
+    }
     
 if __name__ == "__main__":
     # data path
